@@ -36,6 +36,5 @@ let executeProgramsParallel (system: ActorSystem) (filePaths: string list) : Asy
                 })
 
         let! results = Async.Parallel tasks
-        system.Terminate() |> Async.AwaitTask |> ignore
         return List.ofArray results
     }

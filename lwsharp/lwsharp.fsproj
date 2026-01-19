@@ -6,21 +6,21 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="src\Errors.fs" />
-        <Compile Include="src\Syntax.fs" />
-        <Compile Include="src\State.fs" />
-        <Compile Include="src\Ports.fs" />
-        <Compile Include="src\StoreActor.fs" />
-        <Compile Include="src\SemanticComposition.fs" />
-        <Compile Include="src\InterpreterEffect.fs" />
-        <Compile Include="src\Interpreter.fs" />
-        <Compile Include="src\Parser.fs" />
-        <Compile Include="src\ProgramExecutor.fs" />
-        <Compile Include="src\ReplAdapter.fs" />
-        <Compile Include="src\CliAdapter.fs" />
-        <Compile Include="src\CliRunner.fs" />
-        <Compile Include="src\ReplRunner.fs" />
-        <Compile Include="Main.fs" />
+        <Compile Include="src\Core\Errors.fs" />
+        <Compile Include="src\Core\Syntax.fs" />
+        <Compile Include="src\Core\State.fs" />
+        <Compile Include="src\Core\Parser.fs" />
+        <Compile Include="src\Core\StoreActor.fs"/>
+        <Compile Include="src\Core\InterpreterEffect.fs" />
+        <Compile Include="src\Core\Interpreter.fs" />
+        <Compile Include="src\Core\SemanticComposition.fs" />
+        <Compile Include="src\Ports\Ports.fs" />
+        <Compile Include="src\Core\ProgramExecutor.fs" />
+        <Compile Include="src\Adapters\CliAdapter.fs" />
+        <Compile Include="src\Adapters\ReplAdapter.fs" />
+        <Compile Include="src\Application\CliRunner.fs" />
+        <Compile Include="src\Application\ReplRunner.fs" />
+        <Compile Include="src\Main.fs" />
     </ItemGroup>
 
     <ItemGroup>

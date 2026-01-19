@@ -2,7 +2,7 @@ module lwsharp.StoreActor
 
 open Akka.Actor
 open Akka.FSharp
-open lwsharp.Errors
+open Errors
 
 type StoreMessage =
     | ReadVar of string
