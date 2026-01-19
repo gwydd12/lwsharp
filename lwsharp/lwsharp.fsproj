@@ -9,16 +9,22 @@
         <Compile Include="src\Errors.fs" />
         <Compile Include="src\Syntax.fs" />
         <Compile Include="src\State.fs" />
+        <Compile Include="src\Ports.fs" />
         <Compile Include="src\StoreActor.fs" />
         <Compile Include="src\SemanticComposition.fs" />
         <Compile Include="src\InterpreterEffect.fs" />
         <Compile Include="src\Interpreter.fs" />
-        <Compile Include="src\InterpreterService.fs" />
         <Compile Include="src\Parser.fs" />
+        <Compile Include="src\CliRunner.fs" />
+        <Compile Include="src\ProgramExecutor.fs" />
+        <Compile Include="src\Adapters\CliAdapter.fs" />
+        <Compile Include="src\Adapters\ReplAdapter.fs" />
         <Compile Include="Main.fs" />
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Akka" Version="1.5.58" />
+      <PackageReference Include="Akka.FSharp" Version="1.5.58" />
       <PackageReference Include="FParsec" Version="2.0.0-beta2" />
     </ItemGroup>
 

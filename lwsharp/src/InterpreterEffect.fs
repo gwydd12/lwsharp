@@ -1,13 +1,12 @@
 // InterpreterEffect.fs
 module lwsharp.InterpreterEffect
 
-open lwsharp.Syntax
+open Akka.Actor
 
-// New computation type that carries the actor reference
 type Computation<'a> =
-    Computation of (MailboxProcessor<StoreActor.StoreMessage> -> Async<Result<'a, Errors.RuntimeError>>)
-
-let run (Computation f) (storeActor: MailboxProcessor<StoreActor.StoreMessage>) : Async<Result<'a, Errors.RuntimeError>> =
+    Computation of (IActorRef -> Async<Result<'a, Errors.RuntimeError>>)
+    
+let run (Computation f) (storeActor: IActorRef) : Async<Result<'a, Errors.RuntimeError>> =
     f storeActor
 
 let returnValue (x: 'a) : Computation<'a> =
@@ -26,7 +25,7 @@ let bind (f: 'a -> Computation<'b>) (Computation g) : Computation<'b> =
         })
 
 // Helper to lift async operations into our Computation
-let liftAsync (f: MailboxProcessor<StoreActor.StoreMessage> -> Async<Result<'a, Errors.RuntimeError>>) : Computation<'a> =
+let liftAsync (f: IActorRef -> Async<Result<'a, Errors.RuntimeError>>) : Computation<'a> =
     Computation f
 
 // Helper to wrap store actor calls

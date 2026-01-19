@@ -1,47 +1,55 @@
 module lwsharp.StoreActor
 
-open lwsharp.Syntax
+open Akka.Actor
+open Akka.FSharp
 open lwsharp.Errors
 
-// Messages that can be sent to the store actor
 type StoreMessage =
-    | ReadVar of var: string * replyChannel: AsyncReplyChannel<Result<Value, RuntimeError>>
-    | WriteVar of var: string * value: Value * replyChannel: AsyncReplyChannel<unit>
-    | GetState of replyChannel: AsyncReplyChannel<State.Store>
+    | ReadVar of string
+    | WriteVar of string * int
+    | GetState
 
-// Create and start the store actor using F# mailbox
-let createStoreActor () : MailboxProcessor<StoreMessage> =
-    MailboxProcessor.Start(fun inbox ->
+let createStoreActor (system: ActorSystem) : IActorRef =
+    let actorName = "store" + System.Guid.NewGuid().ToString("N")
+    spawn system actorName (fun mailbox ->
         let rec loop (store: State.Store) =
-            async {
-                let! msg = inbox.Receive()
+            actor {
+                let! msg = mailbox.Receive()
+                let sender = mailbox.Sender()
+
                 match msg with
-                | ReadVar (var, replyChannel) ->
+                | ReadVar var ->
                     let result =
                         match Map.tryFind var store with
                         | Some v -> Ok v
                         | None -> Error (UndefinedVariable var)
-                    replyChannel.Reply(result)
+                    sender <! result
                     return! loop store
-                    
-                | WriteVar (var, value, replyChannel) ->
+
+                | WriteVar (var, value) ->
                     let newStore = Map.add var value store
-                    replyChannel.Reply(())
+                    sender <! ()
                     return! loop newStore
-                    
-                | GetState replyChannel ->
-                    replyChannel.Reply(store)
+
+                | GetState ->
+                    sender <! store
                     return! loop store
             }
         loop State.emptyStore
     )
 
-// Helper functions to interact with the actor
-let readVar (actor: MailboxProcessor<StoreMessage>) (var: string) : Async<Result<Value, RuntimeError>> =
-    actor.PostAndAsyncReply(fun replyChannel -> ReadVar(var, replyChannel))
 
-let writeVar (actor: MailboxProcessor<StoreMessage>) (var: string) (value: Value) : Async<unit> =
-    actor.PostAndAsyncReply(fun replyChannel -> WriteVar(var, value, replyChannel))
+let readVar (actor: IActorRef) (var: string)
+    : Async<Result<int, RuntimeError>> =
+    actor.Ask<Result<int, RuntimeError>>(ReadVar var)
+    |> Async.AwaitTask
 
-let getState (actor: MailboxProcessor<StoreMessage>) : Async<State.Store> =
-    actor.PostAndAsyncReply(fun replyChannel -> GetState(replyChannel))
+let writeVar (actor: IActorRef) (var: string) (value: int)
+    : Async<unit> =
+    actor.Ask<unit>(WriteVar (var, value))
+    |> Async.AwaitTask
+
+let getState (actor: IActorRef)
+    : Async<State.Store> =
+    actor.Ask<State.Store>(GetState)
+    |> Async.AwaitTask
