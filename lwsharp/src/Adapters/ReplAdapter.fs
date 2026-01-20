@@ -3,19 +3,22 @@ module lwsharp.Adapters.ReplAdapter
 open Akka.Actor
 open lwsharp.Errors
 open lwsharp.Parser
-open lwsharp.ProgramExecutor
+open lwsharp.Pipeline
 open lwsharp.Ports
 
 type ReplAdapter(storeActor: IActorRef) =
     interface IExecutionMode with
         member _.ExecuteFile filePath =
             async {
-                return! executeProgramFile storeActor filePath
+                let! result = executeProgramFile storeActor filePath
+                return result
             }
         
         member _.ExecuteStatement source =
             async {
                 match parseProgram source with
-                | Error err -> return Error (UndefinedVariable err)
-                | Ok ast -> return! executeAst storeActor ast
+                | Error err -> return Error (Parse (SyntaxError err))
+                | Ok ast ->
+                    let! result = execute storeActor ast
+                    return result
             }

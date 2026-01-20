@@ -1,8 +1,8 @@
 module lwsharp.CliRunner
 
 open Akka.Actor
-
 open lwsharp.Adapters.CliAdapter
+open lwsharp.Pipeline
 open lwsharp.Ports
 
 let printResult (result: ProgramResult) : unit =
@@ -31,8 +31,14 @@ let executeProgramsParallel (system: ActorSystem) (filePaths: string list) : Asy
             |> List.map (fun filePath ->
                 async {
                     let! result = (adapter :> IExecutionMode).ExecuteFile filePath
-                    printResult result
-                    return result
+                    match result with
+                    | Ok programResult ->
+                        printResult programResult
+                        return programResult
+                    | Error err ->
+                        let failed = { FilePath = filePath; Success = false; Store = Map.empty; Error = Some err }
+                        printResult failed
+                        return failed
                 })
 
         let! results = Async.Parallel tasks

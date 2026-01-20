@@ -14,8 +14,8 @@
         <Compile Include="src\Core\InterpreterEffect.fs" />
         <Compile Include="src\Core\Interpreter.fs" />
         <Compile Include="src\Core\SemanticComposition.fs" />
+        <Compile Include="src\Core\Pipeline.fs" />
         <Compile Include="src\Ports\Ports.fs" />
-        <Compile Include="src\Core\ProgramExecutor.fs" />
         <Compile Include="src\Adapters\CliAdapter.fs" />
         <Compile Include="src\Adapters\ReplAdapter.fs" />
         <Compile Include="src\Application\CliRunner.fs" />

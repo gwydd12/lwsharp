@@ -22,11 +22,9 @@ let integer : Parser<int, unit> = pint32 .>> ws
 // Lexeme: parse p and skip trailing whitespace
 let lexeme p = p .>> ws
 
-// Keywords and operators
 let kw s = lexeme (pstring s)
 let op s = (pstring s .>> ws) >>% ()
 
-// Basic expression term (variable or integer)
 let exprTerm : Parser<Expr, unit> =
     choice [
         integer |>> Const
@@ -34,7 +32,6 @@ let exprTerm : Parser<Expr, unit> =
         kw "(" >>. expr .>> kw ")"
     ]
 
-// Expression: parse terms with binary operators left-associatively
 let parseExpr () : Parser<Expr, unit> =
     let term = exprTerm
     let addOp = op "+" >>% (fun x y -> Add(x, y))
@@ -47,60 +44,51 @@ let parseExpr () : Parser<Expr, unit> =
 
 do exprRef.Value <- parseExpr ()
 
-// Assignment: x := expr
 let assignStmt : Parser<Stmt, unit> =
     pipe2 
         (identifier .>> kw ":=") 
         expr 
         (fun v e -> Assign(v, e))
 
-// Skip statement
 let skipStmt : Parser<Stmt, unit> =
     kw "skip" >>% Skip
 
-// Primitive statements (no control flow)
 let primitiveStmt : Parser<Stmt, unit> =
     choice [
         attempt skipStmt
         attempt assignStmt
     ]
 
-// LOOP statement
 let loopStmt : Parser<Stmt, unit> =
     pipe2
         (kw "LOOP" >>. identifier .>> kw "DO")
         (stmt .>> kw "END")
         (fun var body -> Loop(Var var, body))
 
-// WHILE statement
 let whileStmt : Parser<Stmt, unit> =
     pipe2
         (kw "WHILE" >>. identifier .>> kw "DO")
         (stmt .>> kw "END")
         (fun var body -> While(Var var, body))
 
-// Control flow statements
 let controlStmt : Parser<Stmt, unit> =
     choice [
         loopStmt
         whileStmt
     ]
 
-// Any single statement
 let singleStmt : Parser<Stmt, unit> =
     choice [
         controlStmt
         attempt primitiveStmt
     ]
 
-// Statement separator: semicolon and/or newline
 let separator : Parser<unit, unit> =
     skipMany1 (choice [
         pchar ';'
         anyOf "\r\n"
     ]) .>> ws_nl
 
-// Statement sequence separated by semicolons and/or newlines
 let statementSeq : Parser<Stmt, unit> =
     ws_nl >>. sepEndBy1 singleStmt separator
     |>> fun stmts ->
@@ -110,7 +98,6 @@ let statementSeq : Parser<Stmt, unit> =
 
 do stmtRef.Value <- statementSeq
 
-// Program: optional whitespace, statements, optional whitespace, EOF
 let program : Parser<Stmt, unit> =
     ws_nl >>. statementSeq .>> ws_nl .>> eof
 

@@ -2,12 +2,8 @@ module lwsharp.Ports
 
 open lwsharp.Errors
 open lwsharp.Syntax
+open lwsharp.Pipeline
 
-type ProgramResult =
-    { FilePath: string
-      Success: bool
-      Store: State.Store
-      Error: RuntimeError option }
 
 type IFileReader =
     abstract ReadFile : filePath: string -> Result<string, string>
@@ -25,5 +21,5 @@ type IProgramExecutor =
     abstract Execute : ast: Stmt -> Async<Result<State.Store, RuntimeError>>
 
 type IExecutionMode =
-    abstract ExecuteFile : filePath: string -> Async<ProgramResult>
-    abstract ExecuteStatement : source: string -> Async<Result<State.Store, RuntimeError>>
+    abstract ExecuteFile : filePath: string -> Async<Result<ProgramResult, PipelineError>>
+    abstract ExecuteStatement : source: string -> Async<Result<State.Store, PipelineError>>

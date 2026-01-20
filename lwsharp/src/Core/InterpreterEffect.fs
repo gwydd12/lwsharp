@@ -28,7 +28,6 @@ let bind (f: 'a -> Computation<'b>) (Computation g) : Computation<'b> =
 let liftAsync (f: IActorRef -> Async<Result<'a, Errors.RuntimeError>>) : Computation<'a> =
     Computation f
 
-// Helper to wrap store actor calls
 let readVarComp (var: string) : Computation<int> =
     Computation (fun storeActor ->
         async {
