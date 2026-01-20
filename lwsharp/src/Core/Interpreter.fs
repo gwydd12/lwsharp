@@ -14,24 +14,16 @@ let rec evalExpr (expr: Expr) : Computation<int> =
         readVarComp x
         
     | Add (a, b) ->
-        bind (fun x ->
-        bind (fun y ->
-            returnValue (x + y)) (evalExpr b)) (evalExpr a)
+        map (fun x y -> x + y) (evalExpr a) <*> (evalExpr b)
             
     | Sub (a, b) ->
-        bind (fun x ->
-        bind (fun y ->
-            returnValue (x - y)) (evalExpr b)) (evalExpr a)
+        map (fun x y -> x - y) (evalExpr a) <*> (evalExpr b)
             
     | Mul (a, b) ->
-        bind (fun x ->
-        bind (fun y ->
-            returnValue (x * y)) (evalExpr b)) (evalExpr a)
+        map (fun x y -> x * y) (evalExpr a) <*> (evalExpr b)
             
     | Div (a, b) ->
-        bind (fun x ->
-        bind (fun y ->
-            returnValue (x / y)) (evalExpr b)) (evalExpr a)
+        map (fun x y -> x / y) (evalExpr a) <*> (evalExpr b)
 
 let rec evalStmt (stmt: Stmt) : Computation<unit> =
     match stmt with

@@ -4,6 +4,7 @@ open Akka.Actor
 open lwsharp.Adapters.CliAdapter
 open lwsharp.Pipeline
 open lwsharp.Ports
+open lwsharp.ExecutionEvents
 
 let printResult (result: ProgramResult) : unit =
     let status = if result.Success then "SUCCESS" else "FAILED"
@@ -43,4 +44,30 @@ let executeProgramsParallel (system: ActorSystem) (filePaths: string list) : Asy
 
         let! results = Async.Parallel tasks
         return List.ofArray results
+    }
+    
+let outputLock = System.Object()
+
+let safeWrite (observer: ExecutionObserver) (event: ExecutionEvent) : unit =
+    lock outputLock (fun () ->
+        observer.OnNext event
+    )
+
+let executeProgramsReactive (system: ActorSystem) (filePaths: string list) (observer: ExecutionObserver) : Async<unit> =
+    async {
+        let adapter = CliAdapter system
+        let tasks =
+            filePaths
+            |> List.map (fun filePath ->
+                async {
+                    let! result = (adapter :> IExecutionMode).ExecuteFile filePath
+                    match result with
+                    | Ok programResult ->
+                        safeWrite observer (FileCompleted (filePath, programResult))
+                    | Error err ->
+                        safeWrite observer (FileError (filePath, err))
+                })
+
+        do! Async.Parallel tasks |> Async.Ignore
+        safeWrite observer AllComplete
     }

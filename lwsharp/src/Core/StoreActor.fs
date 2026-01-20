@@ -33,7 +33,7 @@ let createStoreActor (system: ActorSystem) : IActorRef =
 
                 | GetState ->
                     sender <! store
-                    return! loop store
+                    return! loop store 
             }
         loop State.emptyStore
     )

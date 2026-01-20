@@ -5,18 +5,8 @@ open Akka.Actor
 open lwsharp.InterpreterEffect
 open lwsharp.Parser
 open lwsharp.Interpreter
-open lwsharp.Errors
 open lwsharp.StoreActor
 open lwsharp.Syntax
-
-// ============================================================================
-// ERROR TYPES AT EACH PIPELINE STAGE
-// ============================================================================
-
-
-type ParsePosition =
-    { Line: int64
-      Column: int64 }
 
 type ParseError =
     | EmptyProgram
@@ -60,10 +50,6 @@ let parse (source: string) : Result<Stmt, PipelineError> =
         | Ok ast -> Ok ast
         | Error err -> Error (Parse (SyntaxError err))
 
-// ============================================================================
-// STAGE 3: EXECUTION
-// ============================================================================
-
 let execute (storeActor: IActorRef) (ast: Stmt) 
     : Async<Result<State.Store, PipelineError>> =
     async {
@@ -75,7 +61,7 @@ let execute (storeActor: IActorRef) (ast: Stmt)
                 let! finalStore = getState storeActor
                 return Ok finalStore
             | Error err ->
-                return Error (Runtime (RuntimeFailure (sprintf "%A" err)))
+                return Error (Runtime (RuntimeFailure $"%A{err}"))
         with
         | ex ->
             return Error (Runtime (RuntimeFailure ex.Message))

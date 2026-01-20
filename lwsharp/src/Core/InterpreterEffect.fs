@@ -1,4 +1,3 @@
-// InterpreterEffect.fs
 module lwsharp.InterpreterEffect
 
 open Akka.Actor
@@ -11,7 +10,7 @@ let run (Computation f) (storeActor: IActorRef) : Async<Result<'a, Errors.Runtim
 
 let returnValue (x: 'a) : Computation<'a> =
     Computation (fun _ -> async { return Ok x })
-
+    
 let bind (f: 'a -> Computation<'b>) (Computation g) : Computation<'b> =
     Computation (fun storeActor ->
         async {
@@ -23,10 +22,18 @@ let bind (f: 'a -> Computation<'b>) (Computation g) : Computation<'b> =
                 let (Computation h) = f value
                 return! h storeActor
         })
+    
+let (>>=) = bind
+    
+let apply (mf: Computation<'a -> 'b>) (mx: Computation<'a>) : Computation<'b> =
+    mf |> bind (fun f ->
+    mx |> bind (fun x ->
+    returnValue (f x)))
 
-// Helper to lift async operations into our Computation
-let liftAsync (f: IActorRef -> Async<Result<'a, Errors.RuntimeError>>) : Computation<'a> =
-    Computation f
+let (<*>) = apply
+
+let map (f: 'a -> 'b) (mx: Computation<'a>) : Computation<'b> =
+    mx |> bind (fun x -> returnValue(f x))
 
 let readVarComp (var: string) : Computation<int> =
     Computation (fun storeActor ->

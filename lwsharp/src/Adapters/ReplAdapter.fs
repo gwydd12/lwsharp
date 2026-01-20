@@ -1,7 +1,6 @@
 module lwsharp.Adapters.ReplAdapter
 
 open Akka.Actor
-open lwsharp.Errors
 open lwsharp.Parser
 open lwsharp.Pipeline
 open lwsharp.Ports
