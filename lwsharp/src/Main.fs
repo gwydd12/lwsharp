@@ -12,21 +12,6 @@ let printUsage () =
     printfn "Or run interactive REPL if no files provided"
     printfn "\nExample: lwsharp program1.lw program2.lw program3.lw"
 
-let createObserver () : ExecutionObserver =
-    {
-        OnNext = fun event ->
-            match event with
-            | FileCompleted (path, result) ->
-                let status = if result.Success then "SUCCESS" else "FAILED"
-                printfn $"%s{status} - %s{path}"
-                if result.Success && not (Map.isEmpty result.Store) then
-                    result.Store |> Map.iter (fun k v -> printfn $"  %s{k} = %d{v}")
-            | FileError (path, err) -> printfn $"ERROR - %s{path}: %A{err}"
-            | AllComplete -> printfn "\n[All files processed]"
-        OnError = fun ex -> printfn $"Fatal: %s{ex.Message}"
-        OnCompleted = fun () -> ()
-    }
-
 [<EntryPoint>]
 let main argv =
     let system = ActorSystem.Create("lwsharp")
@@ -58,8 +43,20 @@ let main argv =
                 invalidFiles |> List.iter (printfn "Error: File not found: %s")
                 1
             else
-                let observer = createObserver ()
-                executeProgramsReactive system filePaths observer |> Async.RunSynchronously
+                let allComplete = new System.Threading.ManualResetEvent(false)
+
+                executeProgramsReactive system filePaths
+                |> Observable.subscribe (fun event ->
+                    match event with
+                    | FileCompleted (_, result) -> printResult result
+                    | FileError (path, err) -> printfn $"Error: %s{path} - %A{err}"
+                    | AllComplete -> 
+                        printfn "Done"
+                        allComplete.Set() |> ignore
+                )
+                |> ignore
+
+                allComplete.WaitOne() |> ignore
                 system.Terminate().Wait()
                 0
     with ex ->

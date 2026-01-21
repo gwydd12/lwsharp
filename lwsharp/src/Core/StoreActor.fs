@@ -39,17 +39,14 @@ let createStoreActor (system: ActorSystem) : IActorRef =
     )
 
 
-let readVar (actor: IActorRef) (var: string)
-    : Async<Result<int, RuntimeError>> =
+let readVar (actor: IActorRef) (var: string) : Async<Result<int, RuntimeError>> =
     actor.Ask<Result<int, RuntimeError>>(ReadVar var)
     |> Async.AwaitTask
 
-let writeVar (actor: IActorRef) (var: string) (value: int)
-    : Async<unit> =
+let writeVar (actor: IActorRef) (var: string) (value: int) : Async<unit> =
     actor.Ask<unit>(WriteVar (var, value))
     |> Async.AwaitTask
 
-let getState (actor: IActorRef)
-    : Async<State.Store> =
+let getState (actor: IActorRef) : Async<State.Store> =
     actor.Ask<State.Store>(GetState)
     |> Async.AwaitTask

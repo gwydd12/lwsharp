@@ -12,7 +12,9 @@ let rec evalExpr (expr: Expr) : Computation<int> =
         
     | Var x ->
         readVarComp x
-        
+    
+    (*Currently we violate here that tail recursion as the recursion is not at the tail, nonetheless we show
+    how apply and map works instead of nested binds. Simpler to read! *)
     | Add (a, b) ->
         map (fun x y -> x + y) (evalExpr a) <*> (evalExpr b)
             

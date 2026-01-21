@@ -35,6 +35,8 @@ let (<*>) = apply
 let map (f: 'a -> 'b) (mx: Computation<'a>) : Computation<'b> =
     mx |> bind (fun x -> returnValue(f x))
 
+let id (x: 'a) : 'a = x // our identity function
+
 let readVarComp (var: string) : Computation<int> =
     Computation (fun storeActor ->
         async {

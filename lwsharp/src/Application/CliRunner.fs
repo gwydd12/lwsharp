@@ -1,5 +1,6 @@
 module lwsharp.CliRunner
 
+open System
 open Akka.Actor
 open lwsharp.Adapters.CliAdapter
 open lwsharp.Pipeline
@@ -45,29 +46,45 @@ let executeProgramsParallel (system: ActorSystem) (filePaths: string list) : Asy
         let! results = Async.Parallel tasks
         return List.ofArray results
     }
-    
-let outputLock = System.Object()
 
-let safeWrite (observer: ExecutionObserver) (event: ExecutionEvent) : unit =
-    lock outputLock (fun () ->
-        observer.OnNext event
-    )
-
-let executeProgramsReactive (system: ActorSystem) (filePaths: string list) (observer: ExecutionObserver) : Async<unit> =
-    async {
-        let adapter = CliAdapter system
-        let tasks =
-            filePaths
-            |> List.map (fun filePath ->
+let outputLock = obj()
+let executeProgramsReactive (system: ActorSystem) (filePaths: string list) : IObservable<ExecutionEvent> =
+    { new IObservable<ExecutionEvent> with
+        member _.Subscribe(observer: IObserver<ExecutionEvent>) : IDisposable =
+            let cts = System.Threading.CancellationTokenSource()
+            
+            Async.Start(
                 async {
-                    let! result = (adapter :> IExecutionMode).ExecuteFile filePath
-                    match result with
-                    | Ok programResult ->
-                        safeWrite observer (FileCompleted (filePath, programResult))
-                    | Error err ->
-                        safeWrite observer (FileError (filePath, err))
-                })
+                    try
+                        let adapter = CliAdapter system
+                        let tasks =
+                            filePaths
+                            |> List.map (fun filePath ->
+                                async {
+                                    let! result = (adapter :> IExecutionMode).ExecuteFile filePath
+                                    match result with
+                                    | Ok programResult ->
+                                        lock outputLock (fun () ->
+                                            observer.OnNext(FileCompleted (filePath, programResult))
+                                        )
+                                    | Error err ->
+                                        lock outputLock (fun () ->
+                                            observer.OnNext(FileError (filePath, err))
+                                        )
+                                })
 
-        do! Async.Parallel tasks |> Async.Ignore
-        safeWrite observer AllComplete
+                        do! Async.Parallel tasks |> Async.Ignore
+                        lock outputLock (fun () ->
+                            observer.OnNext(AllComplete)
+                            observer.OnCompleted()
+                        )
+                    with ex ->
+                        observer.OnError(ex)
+                },
+                cts.Token
+            )
+            
+            { new IDisposable with
+                member _.Dispose() = cts.Cancel()
+            }
     }
