@@ -1,25 +1,14 @@
 module lwsharp.Ports
 
-open lwsharp.Errors
-open lwsharp.Syntax
-open lwsharp.Pipeline
-
+open lwsharp.Core.Syntax
+open lwsharp.Core.State
 
 type IFileReader =
-    abstract ReadFile : filePath: string -> Result<string, string>
+    abstract ReadFile : string -> Result<string, string>
 
-type IStoreManager =
-    abstract GetState : unit -> Async<State.Store>
-    abstract SetVariable : name: string -> value: int -> Async<Result<unit, RuntimeError>>
-    abstract GetVariable : name: string -> Async<Result<int, RuntimeError>>
+type IParser =
+    abstract Parse : string -> Result<Stmt, string>
 
-type ILogger =
-    abstract LogResult : result: ProgramResult -> Async<unit>
-    abstract LogOutput : message: string -> Async<unit>
-
-type IProgramExecutor =
-    abstract Execute : ast: Stmt -> Async<Result<State.Store, RuntimeError>>
-
-type IExecutionMode =
-    abstract ExecuteFile : filePath: string -> Async<Result<ProgramResult, PipelineError>>
-    abstract ExecuteStatement : source: string -> Async<Result<State.Store, PipelineError>>
+type IResultReporter =
+    abstract ReportSuccess : filePath: string * store: Store -> unit
+    abstract ReportError : filePath: string * error: string -> unit

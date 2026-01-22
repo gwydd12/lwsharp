@@ -2,15 +2,10 @@
 
 open System.IO
 open Akka.Actor
-open lwsharp.CliRunner
-open lwsharp.ReplRunner
-open lwsharp.ExecutionEvents
-
-let printUsage () =
-    printfn "Usage: lwsharp [file1] [file2] [file3] ..."
-    printfn "Execute one or more lwsharp programs concurrently"
-    printfn "Or run interactive REPL if no files provided"
-    printfn "\nExample: lwsharp program1.lw program2.lw program3.lw"
+open Akka.FSharp
+open lwsharp.Adapters
+open lwsharp.Actors
+open lwsharp.Ports
 
 [<EntryPoint>]
 let main argv =
@@ -31,9 +26,13 @@ let main argv =
         printfn "\u001b[32m/       \\\u001b[0m"
         printfn "\u001b[33mLOOP LOOP LOOP\u001b[0m"
         
+        let fileReader = FileReader() :> IFileReader
+        let parser = Parser() :> IParser
+        let reporter = ConsoleReporter() :> IResultReporter
+        
         if argv.Length = 0 then
-            runRepl system |> Async.RunSynchronously
-            system.Terminate().Wait()
+            spawn system "repl" (createReplActor parser) |> ignore
+            system.WhenTerminated.Wait()
             0
         else
             let filePaths = Array.toList argv
@@ -43,21 +42,9 @@ let main argv =
                 invalidFiles |> List.iter (printfn "Error: File not found: %s")
                 1
             else
-                let allComplete = new System.Threading.ManualResetEvent(false)
-
-                executeProgramsReactive system filePaths
-                |> Observable.subscribe (fun event ->
-                    match event with
-                    | FileCompleted (_, result) -> printResult result
-                    | FileError (path, err) -> printfn $"Error: %s{path} - %A{err}"
-                    | AllComplete -> 
-                        printfn "Done"
-                        allComplete.Set() |> ignore
-                )
-                |> ignore
-
-                allComplete.WaitOne() |> ignore
-                system.Terminate().Wait()
+                let coordinator = createCoordinator system fileReader parser reporter
+                coordinator <! StartFiles filePaths
+                system.WhenTerminated.Wait()
                 0
     with ex ->
         printfn $"Fatal error: %s{ex.Message}"

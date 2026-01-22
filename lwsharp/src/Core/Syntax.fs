@@ -1,4 +1,4 @@
-module lwsharp.Syntax
+module lwsharp.Core.Syntax
 
 type Var = string
 type Value = int
@@ -17,6 +17,5 @@ type Stmt =
     | Seq of Stmt list
     | Loop of Expr * Stmt
     | While of Expr * Stmt
-        
        
 

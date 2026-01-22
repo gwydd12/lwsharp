@@ -6,4 +6,7 @@ WHILE x1 DO
     x2 := x2 - 1; 
     x1 := x1 - 1; 
     x0 := x0 * 2;
+    LOOP x1 DO 
+        x2 := x2 + 2; 
+    END;
 END

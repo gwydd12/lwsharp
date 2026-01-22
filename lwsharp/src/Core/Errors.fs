@@ -1,8 +1,6 @@
-module lwsharp.Errors
+module lwsharp.Core.Errors
 
 type RuntimeError =
     | DivisionByZero
     | UndefinedVariable of string
     | NegativeLoopBound
-    | NonTerminatingWhile
-    | ParseError of string

@@ -1,59 +1,64 @@
-// Interpreter.fs
-module lwsharp.Interpreter
+module lwsharp.Core.Interpreter
 
-open lwsharp.Syntax
-open lwsharp.InterpreterEffect
-open lwsharp.Errors
+open lwsharp.Core.Syntax
+open lwsharp.Core.Effect
+open lwsharp.Core.Errors
 
+let add a b = a + b
+
+(**
+Nesting problem without bind :(
+| Add (a, b) ->
+    fun store ->
+        match evalExpr a store with
+        | Ok (x, store1) ->
+            match evalExpr b store1 with
+            | Ok (y, store2) ->
+                Ok (add x y, store2)
+            | Error err -> Error err
+        | Error err -> Error err
+*)
 let rec evalExpr (expr: Expr) : Computation<int> =
     match expr with
-    | Const v -> 
-        returnValue v
-        
-    | Var x ->
-        readVarComp x
-    
-    (*Currently we violate here that tail recursion as the recursion is not at the tail, nonetheless we show
-    how apply and map works instead of nested binds. Simpler to read! *)
+    | Const v -> returnValue v
+    | Var x -> readVar x
     | Add (a, b) ->
-        map (fun x y -> x + y) (evalExpr a) <*> (evalExpr b)
-            
+        evalExpr a >>= fun x ->
+        evalExpr b >>= fun y ->
+        returnValue (add x y)
     | Sub (a, b) ->
-        map (fun x y -> x - y) (evalExpr a) <*> (evalExpr b)
-            
+        evalExpr a >>= fun x ->
+        evalExpr b >>= fun y ->
+        returnValue (x - y)
     | Mul (a, b) ->
-        map (fun x y -> x * y) (evalExpr a) <*> (evalExpr b)
-            
+        evalExpr a >>= fun x ->
+        evalExpr b >>= fun y ->
+        returnValue (x * y)
     | Div (a, b) ->
-        map (fun x y -> x / y) (evalExpr a) <*> (evalExpr b)
+        evalExpr a >>= fun x ->
+        evalExpr b >>= fun y ->
+        if y = 0 then fun _ -> Error DivisionByZero
+        else returnValue (x / y)
 
+// Evaluate statements
 let rec evalStmt (stmt: Stmt) : Computation<unit> =
     match stmt with
-    | Skip -> 
-        returnValue ()
-        
+    | Skip -> returnValue ()
     | Assign (x, e) ->
-        bind (writeVarComp x) (evalExpr e)
-            
+        evalExpr e >>= writeVar x
     | Seq stmts ->
-        List.fold (fun acc s ->
-            bind (fun () -> evalStmt s) acc
-        ) (returnValue ()) stmts
-        
+        stmts |> List.fold (fun acc s -> acc >>= fun () -> evalStmt s) (returnValue ())
     | Loop (e, body) ->
-        bind (fun n ->
-            if n < 0 then
-                Computation (fun _ -> async { return Error NegativeLoopBound })
-            else
-                let rec loop i =
-                    if i = 0 then returnValue ()
-                    else bind (fun () -> loop (i-1)) (evalStmt body)
-                loop n) (evalExpr e)
-                
+        evalExpr e >>= fun n ->
+        if n < 0 then fun _ -> Error NegativeLoopBound
+        else
+            let rec loop i =
+                if i = 0 then returnValue ()
+                else evalStmt body >>= fun () -> loop (i - 1)
+            loop n
     | While (cond, body) ->
-        let rec loop () =
-            bind (fun v ->
-                if v = 0 then returnValue ()
-                else bind (fun () -> loop ()) (evalStmt body)
-            ) (evalExpr cond)
-        loop ()
+        let rec whileLoop () =
+            evalExpr cond >>= fun v ->
+            if v = 0 then returnValue ()
+            else evalStmt body >>= fun () -> whileLoop ()
+        whileLoop ()

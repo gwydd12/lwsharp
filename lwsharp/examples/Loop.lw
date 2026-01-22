@@ -1,10 +1,10 @@
-x1 := 0; 
-x2 := 0;
-x0 := 0; 
+x0 := 3;
+x1 := 2;
 
+x1 := 1;
+x9 := x0 + 0;
 LOOP x1 DO
-  x0 := x0 + 1
-END;
-LOOP x2 DO
-  x0 := x0 + 1
+  LOOP x9 DO
+    x0 := x0 + 1;
+  END;
 END

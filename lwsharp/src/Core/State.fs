@@ -1,4 +1,5 @@
-module lwsharp.State
+module lwsharp.Core.State
 
-type Store = Map<Syntax.Var, Syntax.Value>
-let emptyStore : Store = Map.empty
+open lwsharp.Core.Syntax
+
+type Store = Map<Var, int>

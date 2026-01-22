@@ -9,17 +9,12 @@
         <Compile Include="src\Core\Errors.fs" />
         <Compile Include="src\Core\Syntax.fs" />
         <Compile Include="src\Core\State.fs" />
-        <Compile Include="src\Core\Parser.fs" />
-        <Compile Include="src\Core\StoreActor.fs"/>
-        <Compile Include="src\Core\InterpreterEffect.fs" />
+        <Compile Include="src\Core\Effect.fs" />
         <Compile Include="src\Core\Interpreter.fs" />
-        <Compile Include="src\Core\Pipeline.fs" />
-        <Compile Include="src\Core\ExecutionEvents.fs" />
         <Compile Include="src\Ports\Ports.fs" />
-        <Compile Include="src\Adapters\CliAdapter.fs" />
-        <Compile Include="src\Adapters\ReplAdapter.fs" />
-        <Compile Include="src\Application\CliRunner.fs" />
-        <Compile Include="src\Application\ReplRunner.fs" />
+        <Compile Include="src\Core\Pipeline.fs" />
+        <Compile Include="src\Adapters\Adapters.fs" />
+        <Compile Include="src\Actors.fs" />
         <Compile Include="src\Main.fs" />
     </ItemGroup>
 
