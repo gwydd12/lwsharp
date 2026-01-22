@@ -26,7 +26,7 @@ let main argv =
         printfn "\u001b[32m/       \\\u001b[0m"
         printfn "\u001b[33mLOOP LOOP LOOP\u001b[0m"
         
-        let fileReader = FileReader() :> IFileReader
+        let fileReader = FileReader() :> IFileReader // Type casting to interface
         let parser = Parser() :> IParser
         let reporter = ConsoleReporter() :> IResultReporter
         

@@ -30,6 +30,19 @@ let mapForShowCase f m : Computation<'b> =
         | Error err -> Error err
         | Ok (value, newStore) -> Ok (f value, newStore)
 
+let apply (mf: Computation<'a -> 'b>) (m: Computation<'a>) : Computation<'b> =
+    fun store ->
+        match mf store with
+        | Error err -> Error err
+        | Ok (f, store1) ->
+            match m store1 with
+            | Error err -> Error err
+            | Ok (value, store2) -> Ok (f value, store2)
+
+let (<*>) mf m = apply mf m
+
+let pure' (x: 'a) : Computation<'a> = returnValue x
+
 let readVar var : Computation<int> =
     fun store ->
         match Map.tryFind var store with
