@@ -4,6 +4,7 @@ open lwsharp.Core.Syntax
 open lwsharp.Core.Effect
 open lwsharp.Core.Errors
 
+(*I had to write a Monoid in my project so here we go. Probably we have other ^^*)
 let add a b = a + b
 
 (**

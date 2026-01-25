@@ -30,14 +30,20 @@ let mapForShowCase f m : Computation<'b> =
         | Error err -> Error err
         | Ok (value, newStore) -> Ok (f value, newStore)
 
+
 let apply (mf: Computation<'a -> 'b>) (m: Computation<'a>) : Computation<'b> =
     fun store ->
         match mf store with
         | Error err -> Error err
-        | Ok (f, store1) ->
+        | Ok (f, store1) -> 
             match m store1 with
             | Error err -> Error err
             | Ok (value, store2) -> Ok (f value, store2)
+
+let applyWithBind mf m =
+    mf >>= fun f ->
+        m >>= fun x ->
+            returnValue (f x)
 
 let (<*>) mf m = apply mf m
 
