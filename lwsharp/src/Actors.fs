@@ -34,8 +34,6 @@ let createFileExecutor (fileReader: IFileReader) (parser: IParser) (reporter: IR
         }
         loop ()
 
-High-level modules should not depend on low-level modules. Both should depend on abstractions (interfaces).
-
         
 let createCoordinator (system: ActorSystem) (fileReader: IFileReader) (parser: IParser) (reporter: IResultReporter) =
     spawn system "coordinator" (fun mailbox ->

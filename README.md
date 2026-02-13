@@ -11,60 +11,63 @@ An interpreter for LOOP and WHILE written in F#.
 
 ## Description
 
-This interpreter was implemented for the course SWAFP at the Aarhus University. Therefore, the focus of the project was to implement as many course concepts as possible rather than focusing on efficiency of the interpreter. Nevertheless, both languages are fully implemented and can be used within the REPL or executed via cli. 
+Developed for the SWAFP course at Aarhus University, this interpreter prioritizes demonstrating course concepts over performance. Both languages are fully implemented and can be used via the REPL or executed through the CLI.
 
-## Getting Started
+**There are some small bugs in the code, nevertheless the interpreter does its honest work.**
+## Concepts
 
-### Dependencies
+* Monads and Functors
+* Testing and recursive functions
+* Reactive programming
+* Monoids and Model/Type-based programming
+* Akka (Actor model)
+* Functional architecture
+* Error handling and Railway oriented programming
+* Persistent data structures
+* Applicatives and functions
 
-* Describe any prerequisites, libraries, OS version, etc., needed before installing program.
-* ex. Windows 10
+The concepts are defined by the course and are used as a base for the oral exam. 
+For more information about the concepts, please refer to the [course slides](https://github.com/hkirk/swtafp-slides).
 
-### Installing
+## How to use
 
-* How/where to download your program
-* Any modifications needed to be made to files/folders
-
-### Executing program
-
-* How to run the program
-* Step-by-step bullets
+To use the interpreter, you can either run it in the REPL or execute it via CLI.
+* REPL
 ```
-code blocks for commands
+dotnet run --project lwsharp
+// Opens the REPL
+> x10 := 10 
+Store: map [("x10", 10)]
+> LOOP x10 DO x10 := x10 + 1 END
 ```
 
-## Help
-
-Any advise for common problems or issues.
+* CLI - (fun fact: it uses the actor model to execute the files in parallel)
 ```
-command to run if program contains helper info
+dotnet run --project lwsharp -- file1.lw file2.lw
+SUCCESS - /home/stdin/Documents/20-Aarhus/20-University/10-Courses/60-SWAFP-Assignment/lwsharp/lwsharp/examples/Loop.lw
+x0 = 6
+x1 = 1
+x9 = 3
+
+SUCCESS - /home/stdin/Documents/20-Aarhus/20-University/10-Courses/60-SWAFP-Assignment/lwsharp/lwsharp/examples/While.lw
+x0 = 0
+x1 = 0
+x2 = 159200
+
+Done
 ```
 
-## Authors
+## Support
 
-Contributors names and contact info
-
-ex. Dominique Pizzie  
-ex. [@DomPizzie](https://twitter.com/dompizzie)
-
-## Version History
-
-* 0.2
-    * Various bug fixes and optimizations
-    * See [commit change]() or See [release history]()
-* 0.1
-    * Initial Release
-
-## License
-
-This project is licensed under the [NAME HERE] License - see the LICENSE.md file for details
+In case you have any questions, please feel free to reach out to me via email or create an issue in this repository.
+Additionally, if you are interested in taking [SWAFP](https://kursuskatalog.au.dk/en/course/134686/SWAFP-01-Applied-Functional-Programming)
+feel free to reach out to me for more information about the course and the exam I might remember some parts of it or refer to the
+docs folder where I have the slides used at my oral exam.
 
 ## Acknowledgments
 
-Inspiration, code snippets, etc.
-* [awesome-readme](https://github.com/matiassingers/awesome-readme)
-* [PurpleBooth](https://gist.github.com/PurpleBooth/109311bb0361f32d87a2)
-* [dbader](https://github.com/dbader/readme-template)
-* [zenorocha](https://gist.github.com/zenorocha/4526327)
-* [fvcproductions](https://gist.github.com/fvcproductions/1bfc2d4aecb01a834b46)
+* Henrik Bitsch Kirk for the course at the Aarhus University
+* [Functors, Applicatives and Monads blogpost](https://www.adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html)
+* [General F# Blogposts](https://fsharpforfunandprofit.com)
+* [Mark Seemann's blog](https://blog.ploeh.dk/)
 
