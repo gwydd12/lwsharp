@@ -7,7 +7,7 @@
   <br>
 </h1>
 
-An interpreter for LOOP and WHILE written in F#.
+An interpreter for [LOOP and WHILE](https://en.wikipedia.org/wiki/LOOP_(programming_language)) written in F#.
 
 ## Description
 
