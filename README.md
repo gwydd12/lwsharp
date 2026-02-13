@@ -65,6 +65,8 @@ Additionally, if you are interested in taking [SWAFP](https://kursuskatalog.au.d
 feel free to reach out to me for more information about the course and the exam I might remember some parts of it or refer to the
 docs folder where I have the slides used at my oral exam.
 
+Also if you have any feedback on the code, please let me know as this is my first F# project.
+
 ## Acknowledgments
 
 * Henrik Bitsch Kirk for the course at the Aarhus University
