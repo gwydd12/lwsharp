@@ -11,7 +11,7 @@ An interpreter for LOOP and WHILE written in F#.
 
 ## Description
 
-Developed for the SWAFP course at Aarhus University, this interpreter prioritizes demonstrating course concepts over performance. Both languages are fully implemented and can be used via the REPL or executed through the CLI.
+Developed for the [SWAFP (Applied functional programming)](https://kursuskatalog.au.dk/en/course/134686/SWAFP-01-Applied-Functional-Programming) course at Aarhus University, this interpreter prioritizes demonstrating course concepts over performance. Both languages are fully implemented and can be used via the REPL or executed through the CLI.
 
 *There are some small bugs in the code, nevertheless the interpreter does its honest work.*
 ## Concepts
