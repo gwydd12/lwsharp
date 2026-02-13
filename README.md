@@ -13,7 +13,7 @@ An interpreter for LOOP and WHILE written in F#.
 
 Developed for the SWAFP course at Aarhus University, this interpreter prioritizes demonstrating course concepts over performance. Both languages are fully implemented and can be used via the REPL or executed through the CLI.
 
-**There are some small bugs in the code, nevertheless the interpreter does its honest work.**
+*There are some small bugs in the code, nevertheless the interpreter does its honest work.*
 ## Concepts
 
 * Monads and Functors
@@ -60,6 +60,7 @@ Done
 ## Support
 
 In case you have any questions, please feel free to reach out to me via email or create an issue in this repository.
+
 Additionally, if you are interested in taking [SWAFP](https://kursuskatalog.au.dk/en/course/134686/SWAFP-01-Applied-Functional-Programming)
 feel free to reach out to me for more information about the course and the exam I might remember some parts of it or refer to the
 docs folder where I have the slides used at my oral exam.
