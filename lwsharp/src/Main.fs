@@ -30,23 +30,27 @@ let main argv =
         let parser = Parser() :> IParser
         let reporter = ConsoleReporter() :> IResultReporter
         
-        if argv.Length = 0 then
-            spawn system "repl" (createReplActor parser) |> ignore
-            system.WhenTerminated.Wait()
-            0
-        else
-            let filePaths = Array.toList argv
-            let invalidFiles = filePaths |> List.filter (fun f -> not (File.Exists f))
-            
-            if not (List.isEmpty invalidFiles) then
+        match argv with
+            | [|"repl"|] ->
+                spawn system "repl" (createReplActor parser) |> ignore
+                system.WhenTerminated.Wait()
+                0
+            | [|"parallel"|] ->
+               let filePaths = Array.toList argv[1..]
+               let invalidFiles = filePaths |> List.filter (fun f -> not (File.Exists f))
+               if not (List.isEmpty invalidFiles) then
                 invalidFiles |> List.iter (printfn "Error: File not found: %s")
+                system.Terminate() |> ignore
                 1
-            else
+               else
                 let coordinator = createCoordinator system fileReader parser reporter
                 coordinator <! StartFiles filePaths
                 system.WhenTerminated.Wait()
                 0
+            | _ ->
+                printf "Usage: lwsharp [repl | parallel <file1> <file2> ...]\n"
+                1
     with ex ->
-        printfn $"Fatal error: %s{ex.Message}"
-        system.Terminate().Wait()
+        printfn $"Unexpected error: %s{ex.Message}"
+        system.Terminate() |> ignore
         1
