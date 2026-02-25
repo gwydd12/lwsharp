@@ -30,13 +30,12 @@ let main argv =
         let parser = Parser() :> IParser
         let reporter = ConsoleReporter() :> IResultReporter
         
-        match argv with
-            | [|"repl"|] ->
+        match argv |> Array.toList with
+            | ["repl"] ->
                 spawn system "repl" (createReplActor parser) |> ignore
                 system.WhenTerminated.Wait()
                 0
-            | [|"parallel"|] ->
-               let filePaths = Array.toList argv[1..]
+            | "parallel" :: filePaths ->
                let invalidFiles = filePaths |> List.filter (fun f -> not (File.Exists f))
                if not (List.isEmpty invalidFiles) then
                 invalidFiles |> List.iter (printfn "Error: File not found: %s")
