@@ -34,7 +34,7 @@ For more information about the concepts, please refer to the [course slides](htt
 To use the interpreter, you can either run it in the REPL or execute it via CLI.
 * REPL
 ```
-dotnet run --project lwsharp repl
+lwsharp repl
 // Opens the REPL
 > x10 := 10 
 Store: map [("x10", 10)]
@@ -43,13 +43,13 @@ Store: map [("x10", 10)]
 
 * CLI - (fun fact: it uses the actor model to execute the files in parallel)
 ```
-dotnet run --project lwsharp parallel file1.lw file2.lw
-SUCCESS - /home/stdin/Documents/20-Aarhus/20-University/10-Courses/60-SWAFP-Assignment/lwsharp/lwsharp/examples/Loop.lw
+lwsharp parallel file1.lw file2.lw
+SUCCESS - Loop.lw
 x0 = 6
 x1 = 1
 x9 = 3
 
-SUCCESS - /home/stdin/Documents/20-Aarhus/20-University/10-Courses/60-SWAFP-Assignment/lwsharp/lwsharp/examples/While.lw
+SUCCESS - While.lw
 x0 = 0
 x1 = 0
 x2 = 159200
